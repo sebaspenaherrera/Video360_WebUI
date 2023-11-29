@@ -1,5 +1,4 @@
 from dependencies import *
-
 from data.VR_metadata import *
 
 parameters = dict()
@@ -92,10 +91,10 @@ def chart_axis(fig, value):
         fig.update_yaxes(categoryarray=['360p', '540p', '720p', '1080p', '1440p', '4K'],
                          categoryorder="array", range=[-0.5, 6.5])
 
-    elif value == 'screen_frameRate':
-        fig.update_yaxes(range=[69, 76], dtick=2)
+    '''elif value == 'screen_frameRate':
+        fig.update_yaxes(range=[69, 76], dtick=2)'''
 
-    elif value == 'initTime' or value == 'stallTime' or value == 'overallStallTime':
-        fig.update_yaxes(rangemode="nonnegative", range=[-0.5, 5])
+    '''elif value == 'initTime' or value == 'stallTime' or value == 'overallStallTime':
+        fig.update_yaxes(rangemode="nonnegative", range=[-0.5, 5])'''
 
     return fig

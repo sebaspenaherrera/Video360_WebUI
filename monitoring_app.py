@@ -3,10 +3,12 @@ from components.elements.menus.menu_nav import *
 from pagesManagement import *
 import dash_daq as daq
 import dash_bootstrap_components as dbc
+from config_params import ConfigManager
 
+# APP INITIALIZATION
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN], suppress_callback_exceptions=True,
                 requests_pathname_prefix='/monitoring/')
-
+print("Hasta la dash ap test = " + str(ConfigManager.get_parameters("web_cpe")))
 # PAGE CONTENT STYLE (CSS)
 PAGE_CONTENT = {
     "padding": "0px",
@@ -20,7 +22,7 @@ app.layout = dbc.Container([
     # Timers
     dcc.Interval(
         id='timerVR',
-        interval=t_interval,  # in milliseconds, by default
+        interval=ConfigManager.get_parameters('t_interval'),  # in milliseconds, by default
         n_intervals=0
     ),
 
@@ -61,13 +63,14 @@ app.layout = dbc.Container([
     html.Div(id="page-content", style=PAGE_CONTENT),
     html.Hr(),
 
-    html.Img(src="./assets/mobilenet.png", width="200px", style={"margin-left": "30px"}),
-    html.Img(src="./assets/Telma.png", width="200px", style={"margin-left": "30px"}),
+    html.Img(src="./assets/MobilenetLogo.png", width="150px", style={"margin-left": "0px"}),
+    html.Img(src="./assets/TelmaLogo.png", width="150px", style={"margin-left": "30px"}),
     html.Img(src="./assets/uma.png", width="100px", style={"margin-left": "30px"}),
-    html.Img(src="./assets/vodafone.png", width="100px", style={"margin-left": "30px"}),
-    html.Img(src="./assets/juntaAndalucia.svg", width="130px", style={"margin-left": "30px"}),
-    html.Img(src="./assets/UE.svg", width="130px", style={"margin-left": "30px"}),
-    html.Img(src="./assets/andalucia_UE.svg", width="130px", style={"margin-left": "30px"}),
+    html.Img(src="./assets/juntaAndalucia.svg", width="120px", style={"margin-left": "30px"}),
+    html.Img(src="./assets/PlanRecuperacionLogo.png", width="150px", style={"margin-left": "30px"}),
+    html.Img(src="./assets/UnicoLogo.png", width="130px", style={"margin-left": "30px"}),
+    html.Img(src="./assets/FundedbyEULogo.png", width="150px", style={"margin-left": "30px"}),
+    html.Img(src="assets/Mobilenet_QR_text.png", width="150px", style={"margin-left": "10px"}),
 
     # Hidden variables
     html.Div(id="var_data", style={'display': 'none'}),

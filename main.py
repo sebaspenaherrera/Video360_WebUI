@@ -1,23 +1,35 @@
 import uvicorn
-from config_params import *
-from web_server import app as monitoring
-from fastapi import FastAPI
-from fastapi.middleware.wsgi import WSGIMiddleware
-
-
-# Define the FastAPI server
-app = FastAPI()
-# Mount the Dash app as a sub-application in the FastAPI server
-app.mount("/monitoring/", WSGIMiddleware(monitoring.server))
-
-
-# Define the main API endpoint
-@app.get("/")
-def index():
-    return "Hello"
+import argparse
+from config_params import ConfigManager
 
 
 if __name__ == "__main__":
+    # Create the input ArgumentParser
+    parser = argparse.ArgumentParser(description='This is the main file for the WebUI for 360-Video framework.')
+
+    # Add the input parameters
+    parser.add_argument('--host', type=str, help='WebUI host address', default='0.0.0.0')
+    parser.add_argument('--port', type=int, help='WebUI host port', default=8889)
+    parser.add_argument('--cpe', type=str, help='Enables/Disables CPE metrics', default=False)
+    parser.add_argument('--test', type=str, help='Enables/Disables test synthetic samples module', default=False)
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Extract key-value pair arguments
+    port = args.port
+    host = args.host
+    cpe = args.cpe in ['true', '1', 't', 'y', 'yes', 'yeah', 'True', 'certainly', 'uh-huh']
+    test = args.test in ['true', '1', 't', 'y', 'yes', 'yeah', 'True', 'certainly', 'uh-huh']
+
+    #
+    ConfigManager.update_parameters("web_host", host)
+    ConfigManager.update_parameters("web_port", port)
+    ConfigManager.update_parameters("web_cpe", cpe)
+    ConfigManager.update_parameters("web_test", test)
+
+    print(f"{ConfigManager.get_parameters('web_cpe')} AND {ConfigManager.get_parameters('web_test')}")
 
     # Run the rest API app using Uvicorn with the parameters in config_parameters file
-    uvicorn.run(app="main:app", port=web_port, host=web_host, reload=web_reload)
+    uvicorn.run(app=ConfigManager.get_parameters('web_app'), port=port, host=host,
+                reload=ConfigManager.get_parameters('web_reload'))
