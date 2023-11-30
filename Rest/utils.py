@@ -89,13 +89,17 @@ def parse_string_to_int(input_str):
     if input_str is None:
         return input_str
 
+    # If input is empty, return None
+    if input_str == "":
+        return None
+
     # If the input is a number, return it
     if isinstance(input_str, int):
         return input_str
 
     # If the string has special characters, do not parse it
-    if not input_str.isalnum():
-        return input_str
+    #if not input_str.isalnum():
+    #    return input_str
 
     # If the string is a hexadecimal number, parse it to int
     if input_str.startswith('0x'):
@@ -106,9 +110,16 @@ def parse_string_to_int(input_str):
         return int(input_str, 16)
 
     # Use regular expression to extract numeric part
-    match = re.match(r'([-+]?\d*\.\d+|\d+)', input_str)
+    match = re.match(r'([-+]?\d*\.\d+|[-+]?\d+)', input_str)
     if match:
         numeric_part = match.group(0)
         return int(float(numeric_part))
-    # If parsing fails, raise an exception
-    raise ValueError(f"Invalid input: {input_str}")
+
+    # Use regular expression to extract numeric part, if it contains [<>=] symbols
+    match = re.match(r'(?:[<>=])+(\d+)', input_str)
+    if match:
+        numeric_part = match.group(1)
+        return int(numeric_part)
+
+    # If parsing fails, returns string
+    return ""

@@ -7,13 +7,11 @@ from .sample_generator import SyntheticSample as Synthetic
 from config_params import ConfigManager
 
 stats = Stats(n_samples=ConfigManager.get_parameters('rest_n_samples'))
-#stats = Stats(n_samples=Parameters.rest_n_samples)
 app = FastAPI()
 
 
 @app.get("/video360/demo")
-async def get_samples(n_items:Annotated[int, Query(le=ConfigManager.get_parameters('rest_n_samples'))] = 1,
-#async def get_samples(n_items: Annotated[int, Query(le=Parameters.rest_n_samples)] = 1,
+async def get_samples(n_items: Annotated[int, Query(le=ConfigManager.get_parameters('rest_n_samples'))] = 1,
                       cpe: Annotated[bool, Query()] = False):
     # If the number of items is equal or less than n_samples, get n_samples from stats buffer
     data = stats.get_items(end=n_items, cpe=cpe)
@@ -46,6 +44,7 @@ async def append_sample(data: Annotated[SampleStats | None, Body(examples=[examp
     if stats is not None:
         # Parse "CPE" fields that contains "MHz" and "dBm" units to float
         data = data.model_dump()
+
         # If dict has a 'CPE' key, parse the 'signal' key
         if data['CPE']:
             if data['CPE']['signal']:
@@ -54,6 +53,7 @@ async def append_sample(data: Annotated[SampleStats | None, Body(examples=[examp
 
         # Append the sample to the buffer
         stats.append_stats(data)
+
     # Show the number of available samples in buffer
     print(f"{get_time()} REST SERVER --> Samples available in buffer: {stats.get_samples_available()}")
     # Return a confirmation message

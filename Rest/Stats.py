@@ -38,6 +38,7 @@ class Stats:
         # Try to get the items between the bounds start and end. If exception is triggered, return None
         try:
             items = self.data[start:end]
+            # Delete the items from the list
             self.data = self.data[end:]
             if not cpe:
                 items = [sample.get('Service') for sample in items]

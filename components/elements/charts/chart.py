@@ -1,12 +1,26 @@
 from dependencies import *
 from data.VR_metadata import *
+from config_params import ConfigManager
 
 parameters = dict()
 units = dict()
+tags = dict()
 
-# VR
-parameters.update(VR_QOE)
-units.update(VR_UNITS)
+# If CPE flag is not active, only show VR metrics
+if not ConfigManager.get_parameters('web_cpe'):
+    parameters.update(VR_QOE)
+    units.update(VR_UNITS)
+    tags.update(VR_TAGS)
+else:
+    # If CPE flag is active, show VR and CPE metrics
+    parameters.update(VR_QOE)
+    parameters.update(CPE_METRIC)
+    tags.update(VR_TAGS)
+    units.update(VR_UNITS)
+    units.update(CPE_UNITS)
+    tags.update(CPE_TAGS)
+
+print("Para la configuracion de los charts: " + str(len(tags)))
 
 # CSS
 CHART_STYLE = {
@@ -40,7 +54,7 @@ def get_chart(id, menu, initial_value):
     drop_menu = []
     for x in menu:
         # dropMenu.append({'label': x, 'value': x})
-        drop_menu.append({'label': VR_TAGS[x], 'value': x})
+        drop_menu.append({'label': tags[x], 'value': x})
 
     fig = generate_fig(initial_value)
 

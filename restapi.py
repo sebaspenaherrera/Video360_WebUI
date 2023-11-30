@@ -18,12 +18,10 @@ if __name__ == "__main__":
     # Extract key-value pair arguments
     ConfigManager.update_parameters("rest_host", args.host)
     ConfigManager.update_parameters("rest_port", args.port)
-    # Parameters.rest_port = args.port
-    # Parameters.rest_host = args.host
 
     # Check if the local_data_path exists, if not create it
     check_local_data_path(ConfigManager.get_parameters('rest_data_path'))
-    # check_local_data_path(Parameters.rest_data_path)
+
     # Run the rest API app using Uvicorn with the parameters in config_parameters file
     uvicorn.run(app=ConfigManager.get_parameters('rest_app'), port=args.port, host=args.host,
                 reload=ConfigManager.get_parameters('rest_reload'))

@@ -8,7 +8,7 @@ from config_params import ConfigManager
 # APP INITIALIZATION
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN], suppress_callback_exceptions=True,
                 requests_pathname_prefix='/monitoring/')
-print("Hasta la dash ap test = " + str(ConfigManager.get_parameters("web_cpe")))
+
 # PAGE CONTENT STYLE (CSS)
 PAGE_CONTENT = {
     "padding": "0px",
@@ -26,37 +26,35 @@ app.layout = dbc.Container([
         n_intervals=0
     ),
 
-    html.Div([
-        dbc.Row(
-            [
-                dbc.Col(nav()),
-                dbc.Col(),
-                dbc.Col("Interval: ", align="end", width="auto"),
-                dbc.Col(
-                    daq.Slider(
-                        id='refreshTime',
-                        min=1,
-                        max=10,
-                        step=1,
-                        value=2,
-                        marks={
-                            2: '2',
-                            4: '4',
-                            6: '6',
-                            8: '8',
-                            10: '10'
-                        },
-                        size=300
+    html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(nav()),
+                    dbc.Col(),
+                    dbc.Col("Interval: ", align="end", width="auto"),
+                    dbc.Col(
+                        daq.Slider(
+                            id='refreshTime',
+                            min=1,
+                            max=10,
+                            step=1,
+                            value=2,
+                            marks={
+                                2: '2',
+                                4: '4',
+                                6: '6',
+                                8: '8',
+                                10: '10'
+                            },
+                            size=300
+                        ),
+                        align="center"
                     ),
-                    align="center"
-                ),
-            ],
-            justify="end"
-
-            # style={'display': 'inline-block', 'horizontal-align': 'left', 'margin-left': '0vw', 'margin-top': '0vw'}
-        )
-    ]
-        # style={'display': 'inline-block', 'horizontal-align': 'left', 'margin-left': '0vw', 'margin-top': '0vw'}
+                ],
+                justify="end"
+            )
+        ]
     ),
 
     html.Hr(),

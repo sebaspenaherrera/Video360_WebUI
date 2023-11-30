@@ -38,7 +38,8 @@ class SyntheticSample:
                     data_type = str(sub_parameters.get(sub_param).__args__[0]).split(" ")[1][1:-2]
 
                     # If the sub_param contains ['sinr', 'rsrp', 'rsrq', 'rssi'] generate int values
-                    if contains_partial_string(sub_param, ['sinr', 'rsrp', 'rsrq', 'rssi']):
+                    if contains_partial_string(sub_param, ['sinr', 'rsrp', 'rsrq', 'rssi', 'PPusch', 'PPucch',
+                                                           'PPrach','PSrs', 'bandwidth']):
                         cpe_subkey[sub_param] = random.randint(1, 10)
                     else:
                         # According to the data type, save a random/default value
