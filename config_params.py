@@ -2,10 +2,10 @@ import pandas as pd
 import json
 
 
-class ConfigManager:
-    # This class provides global variables that are visible by webui, main and callbacks python files
-    # Initialize parameters
-    parameters = {
+def check_config_file():
+
+    # Set the default parameters
+    params = {
         "datVR": {},
         "n_IVR": 0,
         "t_interval": 2000,
@@ -23,6 +23,26 @@ class ConfigManager:
         "rest_data_path": "./RestData",
         "rest_n_samples": 20,
     }
+
+    # Check if the config.json file exists, else create it
+    try:
+        with open("./config.json", 'r') as f:
+            params = json.load(f)
+    except FileNotFoundError:
+        with open("./config.json", 'w') as f:
+            json.dump(params, f, indent=4)
+
+    # Return the parameters
+    return params
+
+
+class ConfigManager:
+    # This class provides global variables that are visible by webui, main and callbacks python files
+    # Initialize parameters
+    parameters = {}
+
+    # Check if the config.json file exists, else create it
+    parameters = check_config_file()
 
     @classmethod
     def update_parameters(cls, key, value):
@@ -53,3 +73,4 @@ class ConfigManager:
     def read_parameters_json(cls, path):
         with open(path, 'r') as f:
             cls.parameters = json.load(f)
+

@@ -22,7 +22,7 @@ if __name__ == "__main__":
     cpe = args.cpe in ['true', '1', 't', 'y', 'yes', 'yeah', 'True', 'certainly', 'uh-huh']
     test = args.test in ['true', '1', 't', 'y', 'yes', 'yeah', 'True', 'certainly', 'uh-huh']
 
-    #
+    # Update the configuration json file with the input parameters
     ConfigManager.update_parameters("web_host", host)
     ConfigManager.update_parameters("web_port", port)
     ConfigManager.update_parameters("web_cpe", cpe)
