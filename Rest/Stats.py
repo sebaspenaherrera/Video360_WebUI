@@ -41,11 +41,19 @@ class Stats:
             # Delete the items from the list
             self.data = self.data[end:]
             if not cpe:
-                items = [sample.get('Service') for sample in items]
+                # if not CPE is wanted, return None for CPE fields in self.data
+                for sample in items:
+                    sample['CPE'] = {key: None for key in CPEStats.__annotations__.keys()}
+
         except IndexError:
             print("ERROR: CANNOT DELETE THAT SLICE FROM THE MEMORY")
             items = None
-        return items
+
+        # If the list is empty, return None
+        if not self.data:
+            return None
+        else:
+            return items
 
     def reset_stats(self):
         # Clear the whole list

@@ -49,15 +49,20 @@ def update_data(n):
     n_samp = int(ConfigManager.get_parameters('t_interval') / 1000)
     # Get Data from the REST
     data = get_data(n_samp=n_samp, cpe=cpe)
+    # Initialize the variable d to None
+    d = None
+    # Get current time
+    now = datetime.now().strftime("%H:%M:%S")
 
-    if data:
-        print(data)
-        # Check if the received dict-json data is a list or a dict
+    # Check if the received dict-json data is not None
+    if data is not None:
+        print('No es un none')
+        # Check if the received dict-json data is a list (of several dicts-samples) or a dict
         if isinstance(data, list):
             data = data[-1]
             d = data['Service']
         else:
-
+            # If data is not a list, then it is a dict of a single sample
             d = data['Service']
 
         # If cpe flag is active, parse the CPE stats
@@ -66,9 +71,9 @@ def update_data(n):
             d.update(parse_cpe_stats(data))
 
     # Check if the received dict-json data is not empty
-    if d:
+    if d is not None:
         ConfigManager.update_parameters('n_IVR', n)
-        now = datetime.now().strftime("%H:%M:%S")
+
         d.update({'datetime': now})
         print(f"(Web UI) --> {now} Updating...")
         # Update the global variable with the new sample
@@ -85,6 +90,9 @@ def update_data(n):
 
         # Update the global variable with the new sample
         return ConfigManager.get_parameters('n_IVR')
+    else:
+        print(f"{now} (Web UI) --> No data received. Plots will not be updated")
+        return ConfigManager.get_parameters('n_IVR')
 
 
 # Update timer interval
@@ -93,7 +101,6 @@ def update_interval(value):
     ConfigManager.update_parameters('t_interval', 1000 * value)
     print('EVENT: ------- Interval set to: {} ms --------'.format(ConfigManager.get_parameters('t_interval')))
     return ConfigManager.get_parameters('t_interval')
-    # return params.t_interval
 
 
 # Extract CPE stats from REST
@@ -110,6 +117,7 @@ def parse_cpe_stats(value):
                 cpe_errors += 1
                 continue
             else:
+                # For each metric in the CPE, get the numeric values (integer or float)
                 for metric in value['CPE'][parameter].keys():
                     if isinstance(value['CPE'][parameter][metric], (int, float)):
                         cpe_stats.update({metric: value['CPE'][parameter][metric]})

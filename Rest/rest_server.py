@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query, Path, Body
 from typing import Annotated
-from .models import SessionStats, example_POST_testbed, SampleStats, example_POST_demo
+from .models import SessionStats, example_POST_testbed, SampleStats, CPEStats, example_POST_demo
 from .Stats import Stats
 from .utils import *
 from .sample_generator import SyntheticSample as Synthetic
@@ -45,11 +45,15 @@ async def append_sample(data: Annotated[SampleStats | None, Body(examples=[examp
         # Parse "CPE" fields that contains "MHz" and "dBm" units to float
         data = data.model_dump()
 
-        # If dict has a 'CPE' key, parse the 'signal' key
+        # If data contains a 'CPE' key, try to parse (even with None subfields), if not, return CPE field as None
         if data['CPE']:
+            # Parse the 'signal' key
             if data['CPE']['signal']:
                 for key in data['CPE']['signal'].keys():
                     data['CPE']['signal'][key] = parse_string_to_int(data['CPE']['signal'][key])
+        else:
+            # For error handing, if the CPE field is not present, return it as None
+            data['CPE'] = {key: None for key in CPEStats.__annotations__.keys()}
 
         # Append the sample to the buffer
         stats.append_stats(data)
