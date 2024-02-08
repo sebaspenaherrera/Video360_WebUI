@@ -2,6 +2,10 @@ from components.elements.charts.chart import *
 from config_params import ConfigManager
 
 
+# Define counter of CPE errors
+cpe_errors = 0
+
+
 def get_data(n_samp: int = 1, cpe: bool = False):
     base = "http://" + ConfigManager.get_parameters('rest_host') + ":" + str(ConfigManager.get_parameters('rest_port'))
     header = {'content-type': 'application/json'}
@@ -100,9 +104,22 @@ def parse_cpe_stats(value):
     if value['CPE']:
         # Iterate over the CPE stats and get the numeric values
         for parameter in value['CPE'].keys():
-            for metric in value['CPE'][parameter].keys():
-                if isinstance(value['CPE'][parameter][metric], (int, float)):
-                    cpe_stats.update({metric: value['CPE'][parameter][metric]})
+            # If parameter is None, skip it and increase the cpe_errors counter
+            if value['CPE'][parameter] is None:
+                global cpe_errors
+                cpe_errors += 1
+                continue
+            else:
+                for metric in value['CPE'][parameter].keys():
+                    if isinstance(value['CPE'][parameter][metric], (int, float)):
+                        cpe_stats.update({metric: value['CPE'][parameter][metric]})
+
+            # If three CPE errors are detected, set the CPE flag to False (Disable CPE metrics until WEbUI restart)
+            if cpe_errors > 3:
+                ConfigManager.update_parameters('web_cpe', False)
+                cpe_errors = 0
+                print("(Web UI) --> CPE flag set to False")
+
     # Return the CPE stats
     return cpe_stats
 
