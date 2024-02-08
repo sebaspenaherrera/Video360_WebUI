@@ -10,6 +10,11 @@ stats = Stats(n_samples=ConfigManager.get_parameters('rest_n_samples'))
 app = FastAPI()
 
 
+@app.get("/awake")
+async def awake():
+    return {"message": "The server is awake"}
+
+
 @app.get("/video360/demo")
 async def get_samples(n_items: Annotated[int, Query(le=ConfigManager.get_parameters('rest_n_samples'))] = 1,
                       cpe: Annotated[bool, Query()] = False):

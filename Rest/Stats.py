@@ -34,26 +34,21 @@ class Stats:
         return item
 
     def get_items(self, start: int = 0, end: int = 1, cpe: bool = True):
-
-        # Try to get the items between the bounds start and end. If exception is triggered, return None
-        try:
+        # If the list has enough samples, take the samples from the list
+        if len(self.data) >= (end - start):
             items = self.data[start:end]
             # Delete the items from the list
-            self.data = self.data[end:]
+            self.data = self.data[end::]
             if not cpe:
                 # if not CPE is wanted, return None for CPE fields in self.data
                 for sample in items:
                     sample['CPE'] = {key: None for key in CPEStats.__annotations__.keys()}
-
-        except IndexError:
-            print("ERROR: CANNOT DELETE THAT SLICE FROM THE MEMORY")
-            items = None
-
-        # If the list is empty, return None
-        if not self.data:
-            return None
-        else:
+            # Return the samples
             return items
+        else:
+            # If the list has not enough samples, return None
+            print(f"(REST SERVER) --> ERROR: NOT ENOUGH SAMPLES IN MEMORY")
+            return None
 
     def reset_stats(self):
         # Clear the whole list

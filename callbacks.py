@@ -44,19 +44,19 @@ def update_live_graph(d, value):
 
 
 def update_data(n):
+    # Initialize the variable d to None
+    d = None
     # Read current state of the CPE flag
     cpe = ConfigManager.get_parameters('web_cpe')
     n_samp = int(ConfigManager.get_parameters('t_interval') / 1000)
     # Get Data from the REST
     data = get_data(n_samp=n_samp, cpe=cpe)
-    # Initialize the variable d to None
-    d = None
     # Get current time
     now = datetime.now().strftime("%H:%M:%S")
 
+    print(data)
     # Check if the received dict-json data is not None
     if data is not None:
-        print('No es un none')
         # Check if the received dict-json data is a list (of several dicts-samples) or a dict
         if isinstance(data, list):
             data = data[-1]
