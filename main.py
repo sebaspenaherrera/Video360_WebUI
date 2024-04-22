@@ -1,3 +1,11 @@
+'''
+Developer: Sebastian Peñaherrera
+Date: 07/10/2021
+Last Updated: 22/04/2024
+
+Description: This is the main file for the WebUI for 360-Video framework. It is responsible for running the WebUI
+'''
+
 import uvicorn
 import argparse
 from config_params import ConfigManager

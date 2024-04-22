@@ -1,3 +1,11 @@
+'''
+Developed by: Sebastian Peñaherrera
+Date: 07/10/2021
+Last Updated: 22/04/2024
+
+Description: This is the main file for the REST Server for 360-Video framework. It is responsible for running the REST Server
+'''
+
 import uvicorn
 from Rest.utils import *
 from config_params import ConfigManager
