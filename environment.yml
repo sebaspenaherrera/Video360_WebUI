@@ -3,11 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - conda=24.5.0
+  - python
   - uvicorn
   - pandas
   - fastapi
   - dash
   - conda-forge::dash-bootstrap-components
   - conda-forge::dash-daq
-prefix: /Users/SebasPenaherrera/anaconda3/envs/restapi
+#prefix: /Users/SebasPenaherrera/anaconda3/envs/restapi
