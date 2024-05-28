@@ -1,0 +1,56 @@
+FROM ubuntu:latest
+
+EXPOSE 30000-40000
+
+RUN apt-get update && apt-get install wget -y 
+
+RUN apt-get install git -y
+
+RUN cd /opt/ && git clone -c http.sslverify=False https://sppulla:Sebas4080@192.168.159.150:3000/sppulla/Video360_WebUI.git
+
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+
+WORKDIR /opt/Video360_WebUI/
+
+RUN git pull
+#COPY ./Video360_WebUI ./Video360_WebUI/ 
+
+RUN apt-get install tmux -y
+
+RUN apt-get install openssh-server -y
+
+RUN mkdir /var/run/sshd
+RUN echo 'root:mobilenet131' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+#RUN /usr/sbin/sshd -D
+
+RUN mkdir -p /opt/conda
+
+#RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh -O /opt/conda/miniconda.sh 
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /opt/conda/miniconda.sh
+RUN chmod +x /opt/conda/miniconda.sh 
+RUN /opt/conda/miniconda.sh -b -p /opt/miniconda 
+
+#RUN cp ./Video360_WebUI/environment.yml ./tmp/
+
+RUN cp /opt/Video360_WebUI/environment.yml /tmp/
+
+# Add CONDA path to the environments paths
+RUN export CONDA=/opt/miniconda/ && export PATH=$PATH:/opt/miniconda/bin && conda init
+
+#RUN conda activate && conda update conda -y
+#RUN conda activate && conda env create --file /tmp/environment.yml
+# Uncomment once you are ready to start productionizing the image 
+# COPY environment.yaml /tmp 
+RUN . /opt/miniconda/bin/activate && conda update conda -y && conda env create --file /tmp/environment.yml
+
+#RUN . /opt/miniconda/bin/activate && conda env create --file /tmp/environment.yml 
+
+#CMD . /opt/miniconda/bin/activate && conda activate restapi && python opt/Video360_WebUI/main.py -port 33334 > logMain.txt & python opt/Video360_WebUI/restapi.py -port 33333 > logREST.txt &
+RUN chmod +x /opt/Video360_WebUI/run-api.sh
+
+CMD ["/usr/sbin/sshd", "-D"]
+#CMD ["/opt/Video360_WebUI/run-api.sh"]

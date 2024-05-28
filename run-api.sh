@@ -16,5 +16,3 @@ tmux send-keys -t api "python /opt/Video360_WebUI/restapi.py --port 33333" 'Ente
 # Initialize the WebUI
 tmux send-keys -t web ". /opt/miniconda/bin/activate restapi" 'Enter' 
 tmux send-keys -t web "python /opt/Video360_WebUI/main.py --port 33334" 'Enter'
-#python opt/Video360_WebUI/main.py --port 33334 &
-#python opt/Video360_WebUI/restapi.py --port 33333 &
