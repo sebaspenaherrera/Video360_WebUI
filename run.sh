@@ -4,16 +4,20 @@
 #. /opt/miniconda/bin/activate
 #conda activate restapi
 
+# Start the SSH daemon
 /usr/sbin/sshd -D
 
+# Change the working directory to the VIdeo360_WebUI repository
+cd /opt/Video360_WebUI/
+
 # Create a new tmux session for the API and WebUI
-#tmux new-session -s api -d
-#tmux new-session -s web -d
+tmux new-session -s api -d
+tmux new-session -s web -d
 
 # Initialize the API
-#tmux send-keys -t api ". /opt/miniconda/bin/activate restapi" 'Enter' 
-#tmux send-keys -t api "python /opt/Video360_WebUI/restapi.py --port 33333" 'Enter'
+tmux send-keys -t api ". /opt/miniconda/bin/activate restapi" 'Enter' 
+tmux send-keys -t api "python /opt/Video360_WebUI/restapi.py --port 33333" 'Enter'
 
 # Initialize the WebUI
-#tmux send-keys -t web ". /opt/miniconda/bin/activate restapi" 'Enter' 
-#tmux send-keys -t web "python /opt/Video360_WebUI/main.py --port 33334" 'Enter'
+tmux send-keys -t web ". /opt/miniconda/bin/activate restapi" 'Enter' 
+tmux send-keys -t web "python /opt/Video360_WebUI/main.py --port 33334" 'Enter'
