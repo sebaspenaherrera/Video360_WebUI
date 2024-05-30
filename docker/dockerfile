@@ -34,6 +34,6 @@ RUN export CONDA=/opt/miniconda/ && export PATH=$PATH:/opt/miniconda/bin && cond
 RUN . /opt/miniconda/bin/activate && conda update conda -y && conda env create --file /tmp/environment.yml
 
 # DEFAULT CONTAINER COMMAND ------------------------------------------------------------------------------------------------------------------
-RUN chmod +x /opt/Video360_WebUI/run-api.sh
+RUN chmod +x /opt/Video360_WebUI/run.sh
 #CMD ["/usr/sbin/sshd", "-D"]
 CMD ["/opt/Video360_WebUI/run.sh"]

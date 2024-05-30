@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Activate the conda environment for the main screen
-#. /opt/miniconda/bin/activate
-#conda activate restapi
-
-# Start the SSH daemon
-/usr/sbin/sshd -D
-
 # Change the working directory to the VIdeo360_WebUI repository
 cd /opt/Video360_WebUI/
 
@@ -21,3 +14,6 @@ tmux send-keys -t api "python /opt/Video360_WebUI/restapi.py --port 33333" 'Ente
 # Initialize the WebUI
 tmux send-keys -t web ". /opt/miniconda/bin/activate restapi" 'Enter' 
 tmux send-keys -t web "python /opt/Video360_WebUI/main.py --port 33334" 'Enter'
+
+# Start the SSH daemon
+/usr/sbin/sshd -D
