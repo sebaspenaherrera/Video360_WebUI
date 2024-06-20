@@ -1,4 +1,4 @@
-name: restapi
+name: rest
 channels:
   - conda-forge
   - defaults
@@ -10,4 +10,5 @@ dependencies:
   - dash
   - conda-forge::dash-bootstrap-components
   - conda-forge::dash-daq
+  - conda-forge::httpx
 #prefix: /Users/SebasPenaherrera/anaconda3/envs/restapi

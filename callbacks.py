@@ -10,6 +10,7 @@ def get_data(n_samp: int = 1, cpe: bool = False):
     base = "http://" + ConfigManager.get_parameters('rest_host') + ":" + str(ConfigManager.get_parameters('rest_port'))
     header = {'content-type': 'application/json'}
     query = {}
+
     # For normal DEMO mode, use the /demo path
     if not ConfigManager.get_parameters('web_test'):
         url = "/video360/demo"

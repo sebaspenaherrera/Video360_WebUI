@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict
+from typing import List
 
 
 # Class SampleStats for the model contained in each value inside the dict
@@ -150,13 +151,70 @@ class Info(BaseModel):
     spreadname_zh: str | None = None
 
 
+class CrowdCellSample(BaseModel):
+    timestamp: float | None = None
+    cell_id: float | None = None
+    dl_bitrate: float | None = None
+    ul_bitrate: float | None = None
+    dl_tx: float | None = None
+    ul_tx: float | None = None
+    dl_err: float | None = None
+    ul_err: float | None = None
+    dl_retx: float | None = None
+    ul_retx: float | None = None
+    dl_use_min: float | None = None
+    dl_use_max: float | None = None
+    dl_use_avg: float | None = None
+    ul_use_min: float | None = None
+    ul_use_max: float | None = None
+    ul_use_avg: float | None = None
+    dl_sched_users_min: float | None = None
+    dl_sched_users_max: float | None = None
+    dl_sched_users_avg: float | None = None
+    ul_sched_users_min: float | None = None
+    ul_sched_users_max: float | None = None
+    ul_sched_users_avg: float | None = None
+    ue_count_min: float | None = None
+    ue_count_max: float | None = None
+    ue_count_avg: float | None = None
+    ue_active_count_min: float | None = None
+    ue_active_count_max: float | None = None
+    ue_active_count_avg: float | None = None
+    ue_inactive_count_min: float | None = None
+    ue_inactive_count_max: float | None = None
+    ue_inactive_count_avg: float | None = None
+    drb_count_min: float | None = None
+    drb_count_max: float | None = None
+    drb_count_avg: float | None = None
+    dl_gbr_use_min: float | None = None
+    dl_gbr_use_max: float | None = None
+    dl_gbr_use_avg: float | None = None
+    ul_gbr_use_min: float | None = None
+    ul_gbr_use_max: float | None = None
+    ul_gbr_use_avg: float | None = None
+
+
+class CrowdcellStats(BaseModel):
+    Crowdcell_stats: List[CrowdCellSample]
+
+
+class ProcessInfo(BaseModel):
+    timestamp: float | None = None
+    type: str | None = None
+    pid: int | None = None
+    name: str | None = None
+    cpu_percentage : float | None = Field(None, alias='cpu%')
+    core: int | None = None
+
+
+class CPUMonitoring(BaseModel):
+    CPU_stats : List[ProcessInfo]
+
+
 class CPEStats(BaseModel):
     signal: Signal | None = None
     traffic: Traffic | None = None
     info: Info | None = None
-    # signal: dict[str, str] | None = None
-    # traffic: dict[str, str] | None = None
-    # info: dict[str, str] | None = None
 
 
 class SampleStats(BaseModel):
@@ -167,6 +225,9 @@ class SampleStats(BaseModel):
 class SessionStats(BaseModel):
     data: dict[int, SampleStats]
 
+
+class Config:
+    allow_population_by_field_name = True
 
 # Example of a body for a POST operation
 example_POST_testbed = {
@@ -467,4 +528,90 @@ example_POST_demo = {
             "spreadname_zh":"华为 5G CPE Pro 2"
         }
     }
+}
+
+
+example_GET_crowdcell_stats = {
+    "timestamp": 1718803968.640493,
+    "cell_id": 1,
+    "dl_bitrate": 477780,
+    "ul_bitrate": 320,
+    "dl_tx": 2,
+    "ul_tx": 2,
+    "dl_err": 0,
+    "ul_err": 4,
+    "dl_retx": 0,
+    "ul_retx": 36,
+    "dl_use_min": 0,
+    "dl_use_max": 0.264,
+    "dl_use_avg": 0.009,
+    "ul_use_min": 0.038,
+    "ul_use_max": 0.16,
+    "ul_use_avg": 0.068,
+    "dl_sched_users_min": 0,
+    "dl_sched_users_max": 1,
+    "dl_sched_users_avg": 0.002,
+    "ul_sched_users_min": 0,
+    "ul_sched_users_max": 1,
+    "ul_sched_users_avg": 0.25,
+    "ue_count_min": 4,
+    "ue_count_max": 5,
+    "ue_count_avg": 4.872,
+    "ue_active_count_min": 4,
+    "ue_active_count_max": 5,
+    "ue_active_count_avg": 4.859,
+    "ue_inactive_count_min": 0,
+    "ue_inactive_count_max": 0,
+    "ue_inactive_count_avg": 0,
+    "drb_count_min": 1,
+    "drb_count_max": 1,
+    "drb_count_avg": 1.0,
+    "dl_gbr_use_min": 0,
+    "dl_gbr_use_max": 0,
+    "dl_gbr_use_avg": 0,
+    "ul_gbr_use_min": 0,
+    "ul_gbr_use_max": 0,
+    "ul_gbr_use_avg": 0
+},
+{
+    "timestamp": 1718803969.640602,
+    "cell_id": 1,
+    "dl_bitrate": 8740,
+    "ul_bitrate": 420,
+    "dl_tx": 1,
+    "ul_tx": 3,
+    "dl_err": 1,
+    "ul_err": 24,
+    "dl_retx": 6,
+    "ul_retx": 123,
+    "dl_use_min": 0,
+    "dl_use_max": 1.0,
+    "dl_use_avg": 0.019,
+    "ul_use_min": 0.038,
+    "ul_use_max": 0.16,
+    "ul_use_avg": 0.073,
+    "dl_sched_users_min": 0,
+    "dl_sched_users_max": 1,
+    "dl_sched_users_avg": 0.011,
+    "ul_sched_users_min": 0,
+    "ul_sched_users_max": 1,
+    "ul_sched_users_avg": 0.781,
+    "ue_count_min": 4,
+    "ue_count_max": 4,
+    "ue_count_avg": 4.0,
+    "ue_active_count_min": 4,
+    "ue_active_count_max": 4,
+    "ue_active_count_avg": 4.0,
+    "ue_inactive_count_min": 0,
+    "ue_inactive_count_max": 0,
+    "ue_inactive_count_avg": 0,
+    "drb_count_min": 1,
+    "drb_count_max": 1,
+    "drb_count_avg": 1.0,
+    "dl_gbr_use_min": 0,
+    "dl_gbr_use_max": 0,
+    "dl_gbr_use_avg": 0,
+    "ul_gbr_use_min": 0,
+    "ul_gbr_use_max": 0,
+    "ul_gbr_use_avg": 0
 }

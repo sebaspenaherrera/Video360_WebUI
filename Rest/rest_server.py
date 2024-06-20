@@ -1,36 +1,130 @@
 from fastapi import FastAPI, Query, Path, Body
 from typing import Annotated
-from .models import SessionStats, example_POST_testbed, SampleStats, CPEStats, example_POST_demo
+from .models import *
 from .Stats import Stats
 from .utils import *
 from .sample_generator import SyntheticSample as Synthetic
 from config_params import ConfigManager
+import httpx
+from .rest_tools import RestTools as tools
+from starlette.responses import RedirectResponse
 
 stats = Stats(n_samples=ConfigManager.get_parameters('rest_n_samples'))
 app = FastAPI()
 
+# ***************************************************** REST API ENDPOINTS ************************************************************
 
-@app.get("/video360/demo")
+# DEFAULT ENDPOINT ***************************************************************
+@app.get("/", tags=["Default"])
+async def redirect_docs():
+    # Redirect to the documentation page
+    return RedirectResponse(url="/docs/")
+
+
+# CROWDCELL-RELATED ENDPOINTS ****************************************************
+@app.get("/crowdcell/start_stats_monitoring", tags=["Crowdcell Monitoring"])
+async def start_stats_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to start the stats monitoring
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.start_crowd_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring started')
+
+
+@app.get("/crowdcell/stop_stats_monitoring", tags=["Crowdcell Monitoring"])
+async def stop_stats_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to stop the stats monitoring and fetches the stats throughout the monitoring periodç
+
+    Returns:
+    - A dictionary with the stats data {"Crowd_stats": List[CrowcellSample]{key:value}}
+    '''
+
+    return await tools.stop_crowd_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring stopped')
+
+
+@app.get("/crowdcell/start_cpu_monitoring", tags=["Crowdcell Monitoring"])
+async def start_cpu_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to start the CPU monitoring
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.start_crowd_cpu_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring started')
+
+
+@app.get("/crowdcell/stop_cpu_monitoring", tags=["Crowdcell Monitoring"])
+async def stop_cpu_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to stop the CPU monitoring and fetches the CPU stats throughout the monitoring period
+
+    Returns:
+    - A dictionary with the CPU stats data {"CPU_stats": List[ProcessInfo]{key:value}}
+    '''
+
+    return await tools.stop_crowd_cpu_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring stopped')
+
+
+# VIDEO360-RELATED ENDPOINTS ****************************************************
+@app.get("/video360/demo", tags=["Video360"])
 async def get_samples(n_items: Annotated[int, Query(le=ConfigManager.get_parameters('rest_n_samples'))] = 1,
                       cpe: Annotated[bool, Query()] = False):
+    '''
+    This endpoint returns a number of samples from the stats buffer
+
+    Parameters:
+    - n_items: int, default=1. The number of samples to be returned
+    - cpe: bool, default=False. If True, returns the CPE data
+
+    Returns:
+    - A dictionary with the samples data
+    '''
+    
     # If the number of items is equal or less than n_samples, get n_samples from stats buffer
     data = stats.get_items(end=n_items, cpe=cpe)
     return data
 
 
-@app.get("/video360/generate_sample")
+@app.get("/video360/generate_sample", tags=["Video360"])
 async def get_synthetic_sample(cpe: Annotated[bool, Query()] = False):
+    '''
+    This endpoint generates a synthetic sample with random value using the KQI model format
+
+    Parameters:
+    - cpe: bool, default=False. If True, returns the CPE data
+
+    Returns:
+    - A dictionary with the synthetic sample data
+    '''
+    
     # Create a fake sample using KQI model format
     data = Synthetic.generate_sample(cpe=cpe)
     return data
 
 
-@app.post("/video360/testbed/{timestamp}")
+@app.post("/video360/testbed/{timestamp}", tags=["Video360"])
 async def save_session(timestamp: Annotated[int, Path(ge=0)],
                        data: Annotated[SessionStats | None, Body(examples=[example_POST_testbed])]):
+    '''
+    This endpoint saves the session stats data (a 360-video session) in a JSON file
+
+    Parameters:
+    - timestamp: int. The timestamp of the session
+    - data: SessionStats. The session stats data
+
+    Returns:
+    - A dictionary with the timestamp and a confirmation message
+    '''
+    
     # Parse body data as dict-base json
     data_json = data.model_dump()
-    print(f"{get_time()} REST SERVER --> (Received: \n {data_json}")
+    log_message(message=f"Received data: {data_json}", type='DEBUG')
+
     # Write and save as a JSON file in the data folder
     path_file = generate_file_path(str(timestamp), get_local_data_path())
     write_file(path_file, content=data_json, mode='w')
@@ -38,8 +132,18 @@ async def save_session(timestamp: Annotated[int, Path(ge=0)],
     return {"timestamp": timestamp, "message": "Session stats received"}
 
 
-@app.post("/video360/demo/")
+@app.post("/video360/demo/", tags=["Video360"])
 async def append_sample(data: Annotated[SampleStats | None, Body(examples=[example_POST_demo])] = None):
+    '''
+    This endpoint receives a sample and appends it to the stats buffer. Used for demo purposes
+
+    Parameters:
+    - data: SampleStats. The sample data following the KQI pydantic model (SampleStats)
+
+    Returns:
+    - A dictionary with the timestamp and a confirmation message
+    '''
+
     # Append dictionary to the list of samples
     if stats is not None:
         # Parse "CPE" fields that contains "MHz" and "dBm" units to float
@@ -59,6 +163,88 @@ async def append_sample(data: Annotated[SampleStats | None, Body(examples=[examp
         stats.append_stats(data)
 
     # Show the number of available samples in buffer
-    print(f"{get_time()} REST SERVER --> Samples available in buffer: {stats.get_samples_available()}")
+    log_message(message=f"Samples available in buffer: {stats.get_samples_available()}", type='DEBUG')
+
     # Return a confirmation message
     return {"timestamp": get_timestamp(), "message": "Demo stats received"}
+
+
+@app.get("/crowdcell/hello", tags=["General use"])
+async def hello(id: Annotated[str, Query()],
+                enable_crowd: Annotated[bool, Query()] = True,
+                enable_cpe: Annotated[bool, Query()] = True):
+    '''
+    This endpoint returns a hello message
+
+    Returns:
+    - A dictionary with a hello message {"Hello": "World"}
+    '''
+
+    # Start the crowd monitoring
+    if enable_crowd:
+        response = await tools.monitor_crowd()
+    else:
+        response = {"Response": "OK", "Message": "Crowd disabled"}
+
+    return response
+
+
+@app.get("/crowdcell/terminate_monitoring", tags=["General use"])
+async def terminate_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to stop the monitoring
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200} and stats
+    '''
+
+    return await tools.terminate_monitoring_crowd()
+
+
+@app.post("/crowdcell/configure_gain", tags=["Crowdcell configuration"])
+async def configure_gain(gain: Annotated[int, Query(le=0, ge=-100)]):
+    '''
+    This endpoint sends a http request to the crowdcell to configure the gain
+
+    Parameters:
+    - gain: int. The gain value to be set
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.set_gain(gain=gain, host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/cell_gain')
+
+
+@app.post("/crowdcell/configure_noise_level", tags=["Crowdcell configuration"])
+async def configure_noise_level(noise_level: Annotated[int, Query(le=0, ge=-30)]):
+    '''
+    This endpoint sends a http request to the crowdcell to configure the noise level
+
+    Parameters:
+    - noise_level: int. The noise level value to be set
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.set_noise_level(noise_level=noise_level, host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/noise_level')
+
+
+@app.post("/crowdcell/configure_resources", tags=["Crowdcell configuration"])
+async def configure_resources(prbs: Annotated[int, Query(le=106, ge=0)],
+                              rb_start: Annotated[int, Query(le=106, ge=0)],
+                              cell_id: Annotated[int, Query(le=20, ge=0)] = 1):
+    '''
+    This endpoint sends a http request to the crowdcell to configure the resources
+
+    Parameters:
+    - prbs: int. The PRBS value to be set
+    - rb_start: int. The RB start value to be set
+    - cell_id: int, default=1. The cell ID value to be set
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.set_prbs(prbs=prbs, rb_start=rb_start, cell_id=cell_id, host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/config_set')

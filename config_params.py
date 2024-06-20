@@ -22,6 +22,8 @@ def check_config_file():
         "rest_reload": True,
         "rest_data_path": "./RestData",
         "rest_n_samples": 20,
+        "rest_crowd_host": "192.168.159.160",
+        "rest_crowd_port": 5000
     }
 
     # Check if the config.json file exists, else create it

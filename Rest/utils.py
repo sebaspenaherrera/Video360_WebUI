@@ -4,33 +4,69 @@ import os
 from datetime import datetime
 from config_params import ConfigManager
 import re
-
+from termcolor import colored
 
 def get_timestamp():
-    # Return the current timestamp
+    '''
+    Return the current timestamp
+
+    Returns:
+    - The current timestamp
+    '''
+
     ts = int(time.time())
     return ts
 
 
 def get_date():
-    # Return the current date
+    '''
+    Return the current date
+
+    Returns:   
+    - The current date
+    '''
+
     date = datetime.now().date()
     return date
 
 
 def get_time():
-    # Return the current time
+    '''
+    Return the current time
+
+    Returns:
+    - The current time
+    '''
+
     current_time = datetime.now().time()
     return current_time
 
 
 def check_dir(path: str):
-    # Check if the directory exists
+    '''
+    Check if a directory exists
+
+    Parameters:
+    path: str. The path to the directory
+
+    Returns:
+    - True if the directory exists, False otherwise
+    '''
+
     return os.path.exists(path)
 
 
 def create_dir(path: str):
-    # Create the directory
+    '''
+    Create a directory in the specified path
+
+    Parameters:
+    path: str. The path to the directory
+
+    Returns:
+    - The directory has been created
+    '''
+    
     if not check_dir(path):
         os.mkdir(path)
         print("The directory {} has been created".format(path))
@@ -39,28 +75,64 @@ def create_dir(path: str):
 
 
 def check_local_data_path(path: str):
+    '''
+    Check if the local data path exists, else create it
+
+    Parameters:
+    path: str. The path to the local data
+
+    Returns:
+    - None
+    '''
+
     # Check if the ./data directory exists, else create it
     if not check_dir(path):
         create_dir(path)
 
     # Check if the ./data_path/date exists, else create it
-    date = get_date()
     local_path = get_local_data_path()
     if not check_dir(local_path):
         create_dir(local_path)
 
 
 def get_local_data_path():
-    # Return the path to the ./data_path/date
+    '''
+    Returns the path to the ./{rest_data_path}/{current_date}
+
+    Returns:
+    - The path to the local data
+    '''
+
     return f"{ConfigManager.get_parameters('rest_data_path')}/{get_date()}"
 
 
 def check_file(path: str):
-    # Check if the file exists
+    '''
+    Check if a file exists
+
+    Parameters:
+    path: str. The path to the file
+
+    Returns:
+    - True if the file exists, False otherwise
+    '''
+
     return os.path.exists(path)
 
 
 def write_file(path: str, content: json, mode: str = 'w'):
+    '''
+    Write a json content to a file
+
+    Parameters:
+    path: str. The path to the file
+    content: json. The content to be written
+    mode: str, default='w'. The mode to open the file
+
+    Returns:
+    - None
+    '''
+    
     # Check is the directory exists
     check_local_data_path(ConfigManager.get_parameters('rest_data_path'))
     # check_local_data_path(Parameters.rest_data_path)
@@ -75,16 +147,46 @@ def write_file(path: str, content: json, mode: str = 'w'):
 
 
 def convert_dict_to_json(data: dict):
+    '''
+    Wrapper that parses a dictionary into a json string
+
+    Parameters:
+    - data: dict. The dictionary to be parsed
+
+    Returns:
+    - The json string: str
+    '''
+    
     # Convert the dict to json
     return json.dumps(data, indent=4)
 
 
 def generate_file_path(timestamp: str, dir_path: str):
-    # Save stats in the ./data_path/date/Stats_timestamp.json
+    '''
+    Generate the file path to save the stats. The format is ./data_path/date/Stats_timestamp.json
+
+    Parameters:
+    - timestamp: str. The timestamp of the stats
+    - dir_path: str. The path to the directory
+
+    Returns:
+    - The path to the file
+    '''
+    
     return "{}/Stats_{}.json".format(dir_path, timestamp)
 
 
 def parse_string_to_int(input_str):
+    '''
+    This method parses a string in different formats to an integer
+
+    Parameters:
+    - input_str: str. The string to be parsed
+
+    Returns:
+    - The parsed integer
+    '''
+    
     # If input_str is None, return None
     if input_str is None:
         return input_str
@@ -123,3 +225,24 @@ def parse_string_to_int(input_str):
 
     # If parsing fails, returns string
     return ""
+
+
+def log_message(message: str, type: str = 'INFO', entity: str = 'REST Server'):
+    '''
+    This method logs a message to the console
+
+    Parameters:
+    - message: str. The message to be logged
+    - type: str, default='INFO'. The type of the message (INFO or ERROR)
+    - entity: str, default='REST Server'. The entity that logs the message
+    '''
+    
+    # Log the message
+    if type == 'INFO':
+        print(f'{get_time()} ({entity}) --> {colored(message, "green")}')
+    elif type == 'ERROR':
+        print(f'{get_time()} ({entity}) --> {colored(message, "red")}')
+    elif type == 'WARNING':
+        print(f'{get_time()} ({entity}) --> {colored(message, "yellow")}')
+    elif type == 'DEBUG':
+        print(f'{get_time()} ({entity}) --> {colored(message, "blue")}')
