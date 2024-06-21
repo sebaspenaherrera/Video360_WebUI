@@ -11,4 +11,5 @@ dependencies:
   - conda-forge::dash-bootstrap-components
   - conda-forge::dash-daq
   - conda-forge::httpx
+  - termcolor
 #prefix: /Users/SebasPenaherrera/anaconda3/envs/restapi
