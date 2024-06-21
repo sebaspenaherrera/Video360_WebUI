@@ -1,3 +1,11 @@
+# *************************************************************************************************
+# Synchronous REST tools
+# Author: Sebastian Peñaherrera
+# Date: 07/10/2023
+# Summary: This file contains the synchronous REST tools that are used by the REST server
+# Status: Under development
+# *************************************************************************************************
+
 import json
 import time
 import os

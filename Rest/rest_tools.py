@@ -1,3 +1,11 @@
+# *************************************************************************************************
+# Asynchronous REST tools
+# Author: Sebastian Peñaherrera
+# Date: 07/20/2024
+# Summary: This file contains the asynchronous REST tools to send requests to the crowdcell and manage control with the client
+# Status: Under development
+# *************************************************************************************************
+
 import httpx
 from config_params import ConfigManager
 import json
@@ -345,3 +353,133 @@ class RestTools:
             log_message(f'Failed to {message} to {prbs}', type='ERROR')
 
         return {'Response': status_code}
+    
+
+    @staticmethod
+    async def set_mcs(mcs: int, cell_id: int = 1, host_address: str ='rest_crowd_host', port: int | str ='rest_crowd_port', resource: str ='/amarisoft/enb/config_set', message: str ='MCS value set'):
+        '''
+        
+        '''
+
+        # Set the body of the request
+        body = {
+                "cells":{
+                    str(cell_id):{
+                                "pdsch_mcs": mcs
+                                }
+                    } 
+                }
+        
+        # Send a http request to the crowdcell to set the PRBs
+        _, status_code = await RestTools.configure_http_request(request_type='POST', host_address=host_address, port=port, resource=resource, message= message, data=body)
+
+        if status_code == 200:
+            log_message(f'Succesfully {message} to {mcs}', type='DEBUG')
+        else:
+            log_message(f'Failed to {message} to {mcs}', type='ERROR')
+
+        return {'Response': status_code}
+    
+
+    @staticmethod
+    async def reset_crowdcell(host_address: str ='rest_crowd_host', port: int | str ='rest_crowd_port', resource: str ='/crowdcell/restartService', message: str ='Crowdcell reset'):
+        '''
+        Reset the crowdcell
+
+        Parameters:
+        - host_address: str, default='rest_crowd_host'. The address of the crowdcell
+        - port: int | str, default='rest_crowd_port'. The port of the crowdcell
+        - resource: str, default='/amarisoft/enb/reset'. The resource to be accessed in the crowdcell
+        - message: str, default='Crowdcell reset'. The message to be printed to the console
+
+        Returns:
+        - None
+        '''
+
+        # Send a http request to the crowdcell to reset it
+        _, status_code = await RestTools.configure_http_request(request_type='POST', host_address=host_address, port=port, resource=resource, message= message)
+
+        if status_code == 200:
+            log_message(f'Succesfully {message}', type='DEBUG')
+        else:
+            log_message(f'Failed to {message}', type='ERROR')
+
+        return {'Response': status_code}
+    
+
+    @staticmethod
+    async def get_crowdcell_configuration_file(host_address: str ='rest_crowd_host', port: int | str ='rest_crowd_port', resource: str ='/configuration/all', message: str ='Crowdcell configuration file fetched'):
+        '''
+        Get the crowdcell configuration file
+
+        Parameters:
+        - host_address: str, default='rest_crowd_host'. The address of the crowdcell
+        - port: int | str, default='rest_crowd_port'. The port of the crowdcell
+        - resource: str, default='/amarisoft/enb/config'. The resource to be accessed in the crowdcell
+        - message: str, default='Crowdcell configuration file fetched'. The message to be printed to the console
+
+        Returns:
+        - A dictionary with the configuration file
+        '''
+
+        # Send a http request to the crowdcell to get the configuration file
+        response_data, status_code = await RestTools.configure_http_request(request_type='GET', host_address=host_address, port=port, resource=resource, message= message)
+
+        if status_code == 200:
+            log_message(f'Succesfully {message}', type='DEBUG')
+        else:
+            log_message(f'Failed to {message}', type='ERROR')
+
+        return response_data
+    
+
+    @staticmethod
+    async def get_crowdcell_enb_configuration(host_address: str ='rest_crowd_host', port: int | str ='rest_crowd_port', resource: str ='/amarisoft/enb/config_get', message: str ='Crowdcell eNB configuration fetched'):
+        '''
+        Get the crowdcell configuration
+
+        Parameters:
+        - host_address: str, default='rest_crowd_host'. The address of the crowdcell
+        - port: int | str, default='rest_crowd_port'. The port of the crowdcell
+        - resource: str, default='/amarisoft/enb/config'. The resource to be accessed in the crowdcell
+        - message: str, default='Crowdcell configuration fetched'. The message to be printed to the console
+
+        Returns:
+        - A dictionary with the configuration
+        '''
+
+        # Send a http request to the crowdcell to get the configuration
+        response_data, status_code = await RestTools.configure_http_request(request_type='POST', host_address=host_address, port=port, resource=resource, message= message)
+
+        if status_code == 200:
+            log_message(f'Succesfully {message}', type='DEBUG')
+        else:
+            log_message(f'Failed to {message}', type='ERROR')
+
+        return response_data
+    
+
+    @staticmethod
+    async def reset_crowdcell_log(host_address: str ='rest_crowd_host', port: int | str ='rest_crowd_port', resource: str ='/amarisoft/enb/log_reset', message: str ='Crowdcell log reset'):
+        '''
+        Reset the crowdcell log
+
+        Parameters:
+        - host_address: str, default='rest_crowd_host'. The address of the crowdcell
+        - port: int | str, default='rest_crowd_port'. The port of the crowdcell
+        - resource: str, default='/amarisoft/enb/reset'. The resource to be accessed in the crowdcell
+        - message: str, default='Crowdcell log reset'. The message to be printed to the console
+
+        Returns:
+        - None
+        '''
+
+        # Send a http request to the crowdcell to reset the log
+        _, status_code = await RestTools.configure_http_request(request_type='POST', host_address=host_address, port=port, resource=resource, message= message)
+
+        if status_code == 200:
+            log_message(f'Succesfully {message}', type='DEBUG')
+        else:
+            log_message(f'Failed to {message}', type='ERROR')
+
+        return {'Response': status_code}    

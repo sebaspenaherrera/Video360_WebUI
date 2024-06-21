@@ -1,3 +1,11 @@
+# Dockerfile for Video360_WebUI image
+# This image is based on Ubuntu 20.04 and contains all the necessary packages to run the Video360_WebUI project including the conda environment, ssh server, REST server and the web server
+# The image exposes the ports 30000-40000 for the REST server and the web server
+# The image also exposes the port 22 for ssh access
+# Author: Sebastian Peñaherrera
+# Date: 2024-05-10
+# Version: 2.0
+
 FROM ubuntu:latest
 
 EXPOSE 30000-40000

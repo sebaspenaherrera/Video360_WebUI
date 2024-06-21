@@ -1,3 +1,12 @@
+'''
+Summary: This module generates synthetic samples for the KQI and CPE classes based on the type of the field.
+Values are  generated randomly, then sent to the REST server for further processing.
+Author: Sebastian Penaherrera
+Date: 07/10/2023
+Status: Under development
+'''
+
+
 import random
 
 from .models import *
@@ -8,6 +17,16 @@ class SyntheticSample:
 
     @staticmethod
     def generate_sample(cpe: bool = False):
+        '''
+        Generate a synthetic sample for the KQI and CPE classes based on the type of the field. A field is an attribute of the pydantic class.
+
+        Parameters:
+        - cpe: bool. If True, generate a sample for the CPE class. If False, generate a sample for the KQI class.
+
+        Returns:
+        - A dictionary containing the sample
+        '''
+        
         sample = {}
         # Get the KQI class field names
         parameters = KQI.__annotations__
@@ -25,6 +44,7 @@ class SyntheticSample:
             elif data_type == "bool":
                 sample[param] = random.choice([True, False])
 
+        # If cpe is True, generate a sample containing the CPE data
         if cpe:
             sample_cpe = {}
             # Get the CPE class field names
@@ -61,6 +81,17 @@ class SyntheticSample:
 
 
 def contains_partial_string(input_string, substrings):
+    '''
+    Check if the input string contains any of the substrings
+
+    Parameters:
+    - input_string: str. The string to be checked
+    - substrings: list. The list of substrings to check
+
+    Returns:
+    - True if the input string contains any of the substrings. False otherwise
+    '''
+    
     for substring in substrings:
         if substring in input_string:
             return True

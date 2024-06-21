@@ -1,3 +1,7 @@
+'''
+Summary: This module is responsible for managing the pages of the WebUI. It contains the functions that are used to display the different pages of the WebUI.
+'''
+
 from components.pages.MonitoringVR import get_monitoring_component
 
 

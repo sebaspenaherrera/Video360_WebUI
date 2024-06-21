@@ -1,3 +1,12 @@
+'''
+Skeleton for the monitoring app
+
+The monitoring app is a web-based application that displays the VR data in real-time. The app is built using Dash, and it is responsible for displaying the VR data in a user-friendly way. 
+The app consists of several components, such as dropdowns, sliders, and graphs, that allow the user to interact with the data and customize the display.
+
+Version: 1.0. Original skeleton version of Carlos Baena. Updated to ASGI by Sebastian Peñaherrera
+'''
+
 from callbacks import *
 from components.elements.menus.menu_nav import *
 from pagesManagement import *

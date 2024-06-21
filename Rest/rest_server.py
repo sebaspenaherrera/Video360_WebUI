@@ -1,3 +1,10 @@
+#**********************************************************************
+# REST API server for testbed monitoring and crowdcell monitoring
+# Author: Sebastian Peñaherrera
+# Created: 2021-07-01 00:05:00
+# Status: Under development (v2.X)
+#**********************************************************************
+
 from fastapi import FastAPI, Query, Path, Body
 from typing import Annotated
 from .models import *
@@ -19,55 +26,6 @@ app = FastAPI()
 async def redirect_docs():
     # Redirect to the documentation page
     return RedirectResponse(url="/docs/")
-
-
-# CROWDCELL-RELATED ENDPOINTS ****************************************************
-@app.get("/crowdcell/start_stats_monitoring", tags=["Crowdcell Monitoring"])
-async def start_stats_monitoring():
-    '''
-    This endpoint sends a http request to the crowdcell to start the stats monitoring
-
-    Returns:
-    - A dictionary with the response status code {"Response": 200}
-    '''
-
-    return await tools.start_crowd_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring started')
-
-
-@app.get("/crowdcell/stop_stats_monitoring", tags=["Crowdcell Monitoring"])
-async def stop_stats_monitoring():
-    '''
-    This endpoint sends a http request to the crowdcell to stop the stats monitoring and fetches the stats throughout the monitoring periodç
-
-    Returns:
-    - A dictionary with the stats data {"Crowd_stats": List[CrowcellSample]{key:value}}
-    '''
-
-    return await tools.stop_crowd_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring stopped')
-
-
-@app.get("/crowdcell/start_cpu_monitoring", tags=["Crowdcell Monitoring"])
-async def start_cpu_monitoring():
-    '''
-    This endpoint sends a http request to the crowdcell to start the CPU monitoring
-
-    Returns:
-    - A dictionary with the response status code {"Response": 200}
-    '''
-
-    return await tools.start_crowd_cpu_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring started')
-
-
-@app.get("/crowdcell/stop_cpu_monitoring", tags=["Crowdcell Monitoring"])
-async def stop_cpu_monitoring():
-    '''
-    This endpoint sends a http request to the crowdcell to stop the CPU monitoring and fetches the CPU stats throughout the monitoring period
-
-    Returns:
-    - A dictionary with the CPU stats data {"CPU_stats": List[ProcessInfo]{key:value}}
-    '''
-
-    return await tools.stop_crowd_cpu_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring stopped')
 
 
 # VIDEO360-RELATED ENDPOINTS ****************************************************
@@ -168,16 +126,111 @@ async def append_sample(data: Annotated[SampleStats | None, Body(examples=[examp
     # Return a confirmation message
     return {"timestamp": get_timestamp(), "message": "Demo stats received"}
 
+# CROWDCELL-RELATED ENDPOINTS ****************************************************
 
-@app.get("/crowdcell/hello", tags=["General use"])
-async def hello(id: Annotated[str, Query()],
+@app.post("/crowdcell/reset_service", tags=["Crowdcell management"])
+async def reset_crowdcell():
+    '''
+    This endpoint sends a http request to the crowdcell to restart service.
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}, if the reset was successful.
+    '''
+
+    return await tools.reset_crowdcell(host_address='rest_crowd_host', port='rest_crowd_port', resource='/crowdcell/restartService')
+
+@app.post("/crowdcell/reset_log", tags=["Crowdcell management"])
+async def reset_log():
+    '''
+    This endpoint sends a http request to the crowdcell to reset the log
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.reset_crowdcell_log(host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/log_reset')
+
+
+@app.get("/crowdcell/get_configuration_file", tags=["Crowdcell management"])
+async def get_configuration_file():
+    '''
+    This endpoint sends a http request to the crowdcell to get the configuration file
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200} and the configuration file content
+    '''
+
+    return await tools.get_crowdcell_configuration_file(host_address='rest_crowd_host', port='rest_crowd_port', resource='/configuration/all')
+
+
+@app.get("/crowdcell/get_enb_configuration", tags=["Crowdcell management"])
+async def get_enb_configuration():
+    '''
+    This endpoint sends a http request to the crowdcell to get the eNB configuration
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200} and the eNB configuration
+    '''
+
+    return await tools.get_crowdcell_enb_configuration(host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/config_get')
+
+@app.get("/crowdcell/start_stats_monitoring", tags=["Crowdcell monitoring"])
+async def start_stats_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to start the stats monitoring
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.start_crowd_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring started')
+
+
+@app.get("/crowdcell/stop_stats_monitoring", tags=["Crowdcell monitoring"])
+async def stop_stats_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to stop the stats monitoring and fetches the stats throughout the monitoring periodç
+
+    Returns:
+    - A dictionary with the stats data {"Crowd_stats": List[CrowcellSample]{key:value}}
+    '''
+
+    return await tools.stop_crowd_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/monitoring', message='Crowd stats monitoring stopped')
+
+
+@app.get("/crowdcell/start_cpu_monitoring", tags=["Crowdcell monitoring"])
+async def start_cpu_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to start the CPU monitoring
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.start_crowd_cpu_monitoring(request_type='POST', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring started')
+
+
+@app.get("/crowdcell/stop_cpu_monitoring", tags=["Crowdcell monitoring"])
+async def stop_cpu_monitoring():
+    '''
+    This endpoint sends a http request to the crowdcell to stop the CPU monitoring and fetches the CPU stats throughout the monitoring period
+
+    Returns:
+    - A dictionary with the CPU stats data {"CPU_stats": List[ProcessInfo]{key:value}}
+    '''
+
+    return await tools.stop_crowd_cpu_monitoring(request_type='GET', host_address='rest_crowd_host', port='rest_crowd_port', resource='/resources/monitor/', message='Crowd CPU monitoring stopped')
+
+
+@app.get("/crowdcell/initiate_monitoring", tags=["Crowdcell monitoring"])
+async def initiate_monitoring(id: Annotated[str, Query()],
                 enable_crowd: Annotated[bool, Query()] = True,
                 enable_cpe: Annotated[bool, Query()] = True):
     '''
-    This endpoint returns a hello message
+    This endpoint sends a http request to the crowdcell to start the monitoring of CPU and stats
 
     Returns:
-    - A dictionary with a hello message {"Hello": "World"}
+    - A dictionary with a message {"Response": "OK", "Status": "OK"} if the monitoring was successfully started.
     '''
 
     # Start the crowd monitoring
@@ -189,10 +242,10 @@ async def hello(id: Annotated[str, Query()],
     return response
 
 
-@app.get("/crowdcell/terminate_monitoring", tags=["General use"])
+@app.get("/crowdcell/terminate_monitoring", tags=["Crowdcell monitoring"], )
 async def terminate_monitoring():
     '''
-    This endpoint sends a http request to the crowdcell to stop the monitoring
+    This endpoint sends a http request to the crowdcell to stop the monitoring and fetches the stats throughout the monitoring period
 
     Returns:
     - A dictionary with the response status code {"Response": 200} and stats
@@ -248,3 +301,19 @@ async def configure_resources(prbs: Annotated[int, Query(le=106, ge=0)],
     '''
 
     return await tools.set_prbs(prbs=prbs, rb_start=rb_start, cell_id=cell_id, host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/config_set')
+
+
+@app.post("/crowdcell/configure_mcs", tags=["Crowdcell configuration"])
+async def configure_mcs(mcs: Annotated[int, Query(le=28, ge=0)],
+                        cell_id: Annotated[int, Query(le=20, ge=0)] = 1):
+    '''
+    This endpoint sends a http request to the crowdcell to configure the MCS
+
+    Parameters:
+    - mcs: int. The MCS value to be set
+
+    Returns:
+    - A dictionary with the response status code {"Response": 200}
+    '''
+
+    return await tools.set_mcs(mcs=mcs, cell_id=cell_id, host_address='rest_crowd_host', port='rest_crowd_port', resource='/amarisoft/enb/config_set')

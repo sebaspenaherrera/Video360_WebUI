@@ -1,3 +1,10 @@
+'''
+Summary: This class establishes the PYDANTIC models for data validation and serialization
+Author: Sebastian Peñaherrera
+Date: 07/10/2023
+Status: Under development
+'''
+
 from pydantic import BaseModel, Field
 from typing import Dict
 from typing import List

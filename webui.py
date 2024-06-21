@@ -1,3 +1,8 @@
+'''
+Summary: This script defines the FastAPI server and mounts the Dash app as a sub-application.
+This module is responsible for compatibility between FastAPI and Dash (WSGI), and for defining the main API endpoint.
+'''
+
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from starlette.responses import RedirectResponse

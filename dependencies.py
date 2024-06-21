@@ -1,3 +1,7 @@
+'''
+Define all the dependencies that will be used in the project. Planed to be deprecated in the future
+'''
+
 ##################################
 #               Utils
 ##################################
