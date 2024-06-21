@@ -31,13 +31,13 @@ def get_data(n_samp: int = 1, cpe: bool = False):
         return r.json()
     except ConnectionError or TimeoutError:
         traceback.print_exc()
-        log_message(entity='Web UI', message=f'REST unavailable at {base + url}', log_type='ERROR')
+        log_message(entity='Web UI', message=f'REST unavailable at {base + url}', type='ERROR')
         try:
-            log_message(entity='Web UI', message=f'Trying to request again to REST at {base + url}', log_type='DEBUG')
+            log_message(entity='Web UI', message=f'Trying to request again to REST at {base + url}', type='DEBUG')
             r = requests.get(base + url, timeout=10, headers=header)
             return r.json()
         except ConnectionError or TimeoutError:
-            log_message(entity='Web UI', message=f'REST unavailable at {base + url}. Reconnection stopped', log_type='ERROR')
+            log_message(entity='Web UI', message=f'REST unavailable at {base + url}. Reconnection stopped', type='ERROR')
             return {}
 
 
@@ -77,7 +77,7 @@ def update_data(n):
         ConfigManager.update_parameters('n_IVR', n)
 
         d.update({'datetime': now})
-        log_message(entity='Web UI', message=f'Updating...', log_type='DEBUG')
+        log_message(entity='Web UI', message=f'Updating...', type='DEBUG')
 
         # Update the global variable with the new sample
         print(d)
@@ -94,7 +94,7 @@ def update_data(n):
         # Update the global variable with the new sample
         return ConfigManager.get_parameters('n_IVR')
     else:
-        log_message(entity='Web UI', message=f'No data received. Plots will not be updated', log_type='WARNING')
+        log_message(entity='Web UI', message=f'No data received. Plots will not be updated', type='WARNING')
         return ConfigManager.get_parameters('n_IVR')
 
 
@@ -102,7 +102,7 @@ def update_data(n):
 def update_interval(value):
     # Update the global variable with the new interval in milliseconds
     ConfigManager.update_parameters('t_interval', 1000 * value)
-    log_message(entity='Web UI', message=f'Interval set to: {ConfigManager.get_parameters("t_interval")} ms', log_type='INFO')
+    log_message(entity='Web UI', message=f'Interval set to: {ConfigManager.get_parameters("t_interval")} ms', type='INFO')
     return ConfigManager.get_parameters('t_interval')
 
 
@@ -129,7 +129,7 @@ def parse_cpe_stats(value):
             if cpe_errors > 3:
                 ConfigManager.update_parameters('web_cpe', False)
                 cpe_errors = 0
-                log_message(entity='Web UI', message=f'CPE flag set to False', log_type='WARNING')
+                log_message(entity='Web UI', message=f'CPE flag set to False', type='WARNING')
 
     # Return the CPE stats
     return cpe_stats
