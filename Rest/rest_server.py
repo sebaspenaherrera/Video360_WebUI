@@ -19,6 +19,7 @@ from starlette.responses import RedirectResponse
 stats = Stats(n_samples=ConfigManager.get_parameters('rest_n_samples'))
 app = FastAPI()
 
+
 # ***************************************************** REST API ENDPOINTS ************************************************************
 
 # DEFAULT ENDPOINT ***************************************************************
@@ -29,7 +30,8 @@ async def redirect_docs():
 
 
 # VIDEO360-RELATED ENDPOINTS ****************************************************
-@app.get("/video360/demo", tags=["Video360"])
+
+@app.get("/service/video360/demo", tags=["Video360"])
 async def get_samples(n_items: Annotated[int, Query(le=ConfigManager.get_parameters('rest_n_samples'))] = 1,
                       cpe: Annotated[bool, Query()] = False):
     '''
@@ -45,10 +47,12 @@ async def get_samples(n_items: Annotated[int, Query(le=ConfigManager.get_paramet
     
     # If the number of items is equal or less than n_samples, get n_samples from stats buffer
     data = stats.get_items(end=n_items, cpe=cpe)
+
+    # TODO: Implement the crowd monitoring stats in real-time
     return data
 
 
-@app.get("/video360/generate_sample", tags=["Video360"])
+@app.get("/service/video360/generate_sample", tags=["Video360"])
 async def get_synthetic_sample(cpe: Annotated[bool, Query()] = False):
     '''
     This endpoint generates a synthetic sample with random value using the KQI model format
@@ -65,7 +69,7 @@ async def get_synthetic_sample(cpe: Annotated[bool, Query()] = False):
     return data
 
 
-@app.post("/video360/testbed/{timestamp}", tags=["Video360"])
+@app.post("/service/video360/testbed/{timestamp}", tags=["Video360"])
 async def save_session(timestamp: Annotated[int, Path(ge=0)],
                        data: Annotated[SessionStats | None, Body(examples=[example_POST_testbed])]):
     '''
@@ -78,19 +82,32 @@ async def save_session(timestamp: Annotated[int, Path(ge=0)],
     Returns:
     - A dictionary with the timestamp and a confirmation message
     '''
-    
+
+    # HARDCODE: Request crowdcell to send the stats measured during the session
+    if stats.get_crowd_invoked():
+        crowd_stats = await tools.terminate_monitoring_crowd() 
+    else:
+        log_message(message="Crowdcell monitoring not invoked", type='WARNING')
+
     # Parse body data as dict-base json
     data_json = data.model_dump()
-    log_message(message=f"Received data: {data_json}", type='DEBUG')
+    log_message(message=f"Service client stats: {data_json}", type='INFO')
+
+    # HARDCODE: Append the crowdcell stats to the session data
+    if stats.get_crowd_invoked():
+        data_json.update(crowd_stats)
 
     # Write and save as a JSON file in the data folder
     path_file = generate_file_path(str(timestamp), get_local_data_path())
     write_file(path_file, content=data_json, mode='w')
+    
+    log_message(message=f"Session stats saved in {path_file}. Enabling next experiment...", type='SUCCESS', bold=True)
+
     # Return a confirmation message
     return {"timestamp": timestamp, "message": "Session stats received"}
 
 
-@app.post("/video360/demo/", tags=["Video360"])
+@app.post("/service/video360/demo/", tags=["Video360"])
 async def append_sample(data: Annotated[SampleStats | None, Body(examples=[example_POST_demo])] = None):
     '''
     This endpoint receives a sample and appends it to the stats buffer. Used for demo purposes
@@ -232,13 +249,20 @@ async def initiate_monitoring(id: Annotated[str, Query()],
     Returns:
     - A dictionary with a message {"Response": "OK", "Status": "OK"} if the monitoring was successfully started.
     '''
+    log_message(message=f"Initiating experiment with ID: {id}", type='DEBUG', bold=True)
+    # Set the crowd and cpe invoked flags
+    stats.set_crowd_invoked(enable_crowd)
+    stats.set_cpe_invoked(enable_cpe)
 
     # Start the crowd monitoring
+    log_message(message=f"Setting crowd flag to {enable_crowd}", type='WARNING')
     if enable_crowd:
         response = await tools.monitor_crowd()
     else:
-        response = {"Response": "OK", "Message": "Crowd disabled"}
+        response = {"Response": "OK", "Status": True, "Message": "Crowd disabled"}
 
+    
+    
     return response
 
 

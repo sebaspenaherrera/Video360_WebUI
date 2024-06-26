@@ -14,7 +14,8 @@ from .utils import log_message
 class Stats:
     # ATTRIBUTES
     data = []
-
+    crowd_invoked : bool = False
+    cpe_invoked : bool = False
 
     # METHODS
     def check_length(self):
@@ -96,7 +97,7 @@ class Stats:
             return items
         else:
             # If the list has not enough samples, return None
-            log_message(message="Not enough samples in memory", level="ERROR")
+            log_message(message="Not enough samples in memory", type="ERROR")
             return None
 
 
@@ -131,6 +132,55 @@ class Stats:
         
         return str(self.data)
 
+
+    def set_crowd_invoked(self, value: bool):
+        '''
+        Set the crowd_invoked attribute to the specified value.
+
+        Parameters:
+        - value: bool. The value to set the crowd_invoked attribute to.
+
+        Returns:
+        - None
+        '''
+        
+        self.crowd_invoked = value
+
+    
+    def get_crowd_invoked(self):
+        '''
+        Get the value of the crowd_invoked attribute.
+
+        Returns:
+        - The value of the crowd_invoked attribute.
+        '''
+        
+        return self.crowd_invoked
+    
+    
+    def set_cpe_invoked(self, value: bool):
+        '''
+        Set the cpe_invoked attribute to the specified value.
+
+        Parameters:
+        - value: bool. The value to set the cpe_invoked attribute to.
+
+        Returns:
+        - None
+        '''
+        
+        self.cpe_invoked = value
+
+
+    def get_cpe_invoked(self):
+        '''
+        Get the value of the cpe_invoked attribute.
+
+        Returns:
+        - The value of the cpe_invoked attribute.
+        '''
+        
+        return self.cpe_invoked
 
     # STATIC METHODS
     @staticmethod

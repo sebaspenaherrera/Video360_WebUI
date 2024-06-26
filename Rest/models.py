@@ -202,7 +202,7 @@ class CrowdCellSample(BaseModel):
 
 
 class CrowdcellStats(BaseModel):
-    Crowdcell_stats: List[CrowdCellSample]
+    Crowdcell_stats: List[CrowdCellSample] | Dict[str, List] | None = None
 
 
 class ProcessInfo(BaseModel):
@@ -215,7 +215,7 @@ class ProcessInfo(BaseModel):
 
 
 class CPUMonitoring(BaseModel):
-    CPU_stats : List[ProcessInfo]
+    CPU_stats : List[ProcessInfo] | Dict[str, List] | None = None
 
 
 class CPEStats(BaseModel):

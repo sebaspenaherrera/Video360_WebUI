@@ -10,6 +10,7 @@ Description: This is the main file for the WebUI for 360-Video framework. It is 
 import uvicorn
 import argparse
 from config_params import ConfigManager
+from Rest.utils import log_message
 
 
 if __name__ == "__main__":
@@ -37,8 +38,10 @@ if __name__ == "__main__":
     ConfigManager.update_parameters("web_cpe", cpe)
     ConfigManager.update_parameters("web_test", test)
 
-    print(f"{ConfigManager.get_parameters('web_cpe')} AND {ConfigManager.get_parameters('web_test')}")
-
+    log_message(entity='Web UI', message=f"\tCPE Stats: {ConfigManager.get_parameters('web_cpe')}\n\t\t\t\tSynthetic data: {ConfigManager.get_parameters('web_test')}", type='INFO')
+    
     # Run the rest API app using Uvicorn with the parameters in config_parameters file
     uvicorn.run(app=ConfigManager.get_parameters('web_app'), port=port, host=host,
                 reload=ConfigManager.get_parameters('web_reload'))
+
+    

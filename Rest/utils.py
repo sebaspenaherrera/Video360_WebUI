@@ -235,7 +235,7 @@ def parse_string_to_int(input_str):
     return ""
 
 
-def log_message(message: str, type: str = 'INFO', entity: str = 'REST Server'):
+def log_message(message: str, type: str = 'INFO', entity: str = 'REST Server', limit: int = 1000, bold: bool = False):
     '''
     This method logs a message to the console
 
@@ -243,14 +243,33 @@ def log_message(message: str, type: str = 'INFO', entity: str = 'REST Server'):
     - message: str. The message to be logged
     - type: str, default='INFO'. The type of the message (INFO or ERROR)
     - entity: str, default='REST Server'. The entity that logs the message
+    - limit: int, default=1000. The limit of the message to be logged
+    - bold: bool, default=False. If True, the message is bold
+
+    Returns:
+    - None
     '''
     
+    if len(message) > limit:
+        message = message[:limit] + '...'
+
+    if bold:
+        attr = ['bold']
+    else:
+        attr = []
+
     # Log the message
     if type == 'INFO':
-        print(f'{get_time()} ({entity}) --> {colored(message, "green")}')
+        print(f'{get_time()} ({entity}) --> {colored(message, "cyan", attrs=attr)}')
     elif type == 'ERROR':
-        print(f'{get_time()} ({entity}) --> {colored(message, "red")}')
+        print(f'{get_time()} ({entity}) --> {colored(message, "red", attrs=attr)}')
     elif type == 'WARNING':
-        print(f'{get_time()} ({entity}) --> {colored(message, "yellow")}')
+        print(f'{get_time()} ({entity}) --> {colored(message, "yellow", attrs=attr)}')
     elif type == 'DEBUG':
-        print(f'{get_time()} ({entity}) --> {colored(message, "blue")}')
+        print(f'{get_time()} ({entity}) --> {colored(message, "blue", attrs=attr)}')
+    elif type == 'HIGHLIGHT':
+        print(f'{get_time()} ({entity}) --> {colored(message, "magenta", attrs=attr)}')
+    elif type == 'SUCCESS':
+        print(f'{get_time()} ({entity}) --> {colored(message, "green", attrs=attr)}')
+    else:        
+        print(f'{get_time()} ({entity}) --> {colored(message, "white", attrs=attr)}')

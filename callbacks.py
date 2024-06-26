@@ -14,10 +14,10 @@ def get_data(n_samp: int = 1, cpe: bool = False):
 
     # For normal DEMO mode, use the /demo path
     if not ConfigManager.get_parameters('web_test'):
-        url = "/video360/demo"
+        url = "/service/video360/demo"
     else:
         # For UI testing purposes, it is possible to get fake samples from the REST using the /generate_sample path
-        url = "/video360/generate_sample"
+        url = "/service/video360/generate_sample"
 
     # If query params are required, add query params in the url
     if n_samp > 1:

@@ -20,8 +20,6 @@ else:
     units.update(CPE_UNITS)
     tags.update(CPE_TAGS)
 
-print("Para la configuracion de los charts: " + str(len(tags)))
-
 # CSS
 CHART_STYLE = {
     'display': 'auto',
